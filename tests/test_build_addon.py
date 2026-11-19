@@ -1,7 +1,9 @@
+import base64
 import io
 import json
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 import tempfile
 import unittest
@@ -22,9 +24,34 @@ class BuildAddonTest(unittest.TestCase):
                 self.assertEqual(outer.namelist(), ["nether-craft-bp.mcpack"])
                 with zipfile.ZipFile(io.BytesIO(outer.read("nether-craft-bp.mcpack"))) as pack:
                     self.assertIsNone(pack.testzip())
-                    self.assertEqual(set(pack.namelist()), {"manifest.json", "loot_tables/entities/piglin_barter.json"})
+                    expected = {"manifest.json", "loot_tables/entities/piglin_barter.json"}
+                    if (ROOT / "pack_icon.png").is_file():
+                        expected.add("pack_icon.png")
+                    self.assertEqual(set(pack.namelist()), expected)
                     for name in pack.namelist():
                         self.assertEqual(pack.read(name), (ROOT / name).read_bytes())
+
+    def test_icon_is_optional_and_included_at_pack_root(self):
+        icon = base64.b64decode(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aT1sAAAAASUVORK5CYII="
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for name in ["manifest.json", "scripts/build_addon.py", "loot_tables/entities/piglin_barter.json"]:
+                target = root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / name, target)
+            for with_icon in [False, True]:
+                with self.subTest(with_icon=with_icon):
+                    if with_icon:
+                        (root / "pack_icon.png").write_bytes(icon)
+                    subprocess.run([sys.executable, str(root / "scripts/build_addon.py")], check=True, capture_output=True)
+                    addon = next((root / "dist").glob("*.mcaddon"))
+                    with zipfile.ZipFile(addon) as outer:
+                        with zipfile.ZipFile(io.BytesIO(outer.read("nether-craft-bp.mcpack"))) as pack:
+                            self.assertEqual("pack_icon.png" in pack.namelist(), with_icon)
+                            if with_icon:
+                                self.assertEqual(pack.read("pack_icon.png"), icon)
 
     def test_mismatched_tag_produces_no_release_file(self):
         with tempfile.TemporaryDirectory() as output:

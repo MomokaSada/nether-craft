@@ -33,6 +33,10 @@ def main():
     if args.tag is not None and args.tag != f"v{version_text}":
         parser.error(f"tag must match manifest version: v{version_text}")
 
+    icon = root / "pack_icon.png"
+    if icon.is_file():
+        documents[icon.name] = icon.read_bytes()
+
     pack = io.BytesIO()
     with zipfile.ZipFile(pack, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name, data in documents.items():

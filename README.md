@@ -26,6 +26,23 @@ Minecraft統合版1.21.90以降向けのビヘイビアーパックです。既�
 
 サーバー1.26.66.1でパック読み込みを確認済みです。ゲーム内の交易は未検証です。同じ`loot_tables/entities/piglin_barter.json`を変更する別パックと競合します。
 
+## パックアイコン
+
+作成した画像を、`manifest.json`と同じ階層に`pack_icon.png`として配置してください。
+
+```text
+nether-craft/
+├── manifest.json
+├── pack_icon.png    ← ここに配置（256×256pxのPNG推奨）
+└── loot_tables/
+```
+
+`manifest.json`へのアイコン項目の追加は不要です。この名前と配置でMinecraftが認識します。アイコンはGit管理に含めてください。ローカルビルドとGitHub Actionsは、ファイルがあれば自動で配布物に同梱し、なければアイコンなしでビルドします。
+
+配置後は以下のビルドを実行してください。サーバーのマウントからも同じファイルを参照できますが、表示確認にはパックの再読み込みが必要です。
+
+形式・配置の根拠：[Microsoft Learn：Pack Icon](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/mctoolsvalreference/cpackicon?view=minecraft-bedrock-stable)。
+
 ## ビルドとGitHub Releases
 
 このリポジトリのルートで、Python標準ライブラリだけでビルドできます。

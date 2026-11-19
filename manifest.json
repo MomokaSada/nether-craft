@@ -1,0 +1,29 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Nether Craft",
+    "description": "ネザークラフト",
+    "uuid": "98da0cb7-6c7d-4b7b-a8c9-811c497f677c",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      90
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "3ead80ef-7779-43a1-84fe-5a30feef9292",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}
